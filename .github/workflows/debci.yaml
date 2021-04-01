@@ -11,6 +11,14 @@ jobs:
     container: debian:10
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 3
+      - name: find
+        run: find
+      - name: echo
+        run: echo $GITHUB_WORKSPACE
+      - name: find
+        run: find $GITHUB_WORKSPACE
       - name: Update
         run: apt-get update -q
       - name: Install deps
