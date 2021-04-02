@@ -24,6 +24,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 3
+      - name: find
+        run: find
       - name: Install deps
         run: apt-get install -y --no-install-recommends git python3 python3-requests python3-gnupg
       - name: Build
