@@ -23,7 +23,7 @@ jobs:
           apt-get install -y --no-install-recommends -t buster-backports git
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 30
+          fetch-depth: 0
       - name: git
         run: |
           git status
