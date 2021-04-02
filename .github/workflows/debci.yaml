@@ -10,10 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:10
     steps:
+      - name: Use backport to work around checkout
+        run: |
+          cat > /etc/apt/sources.list.d/bp.list <<EOF
+          deb http://deb.debian.org/debian buster-backports main
+          EOF
       - name: Update
         run: apt-get update -q
       - name: Install deps
-        run: apt-get install -y --no-install-recommends git ca-certificates
+        run: |
+          apt-get install -y --no-install-recommends ca-certificates
+          apt-get install -y --no-install-recommends -t buster-backports git
       - uses: actions/checkout@v2
         with:
           fetch-depth: 3
