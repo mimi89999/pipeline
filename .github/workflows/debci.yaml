@@ -13,7 +13,7 @@ jobs:
       - name: Update
         run: apt-get update -q
       - name: Install deps
-        run: apt-get install -y --no-install-recommends git
+        run: apt-get install -y --no-install-recommends git ca-certificates
       - uses: actions/checkout@v2
         with:
           fetch-depth: 3
