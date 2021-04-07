@@ -226,7 +226,7 @@ def setup_gpg_key(keyfp, tmpdir):
         sys.exit(1)
 
     if "DEB_GPG_KEY" in os.environ:
-        gpg = gnupg.GPG(gnupghome=tmpdir)
+        gpg = gnupg.GPG(gnupghome=tmpdir.as_posix())
         import_result = gpg.import_keys(os.getenv("DEB_GPG_KEY"))
         assert import_result.count == 1
         fp = import_result.fingerprints[0]
