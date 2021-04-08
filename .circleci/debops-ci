@@ -286,6 +286,22 @@ def build() -> None:
             print(p)
 
 
+class DuplicatePkgError(Exception):
+    pass
+
+
+def check_duplicate_package(pkgblock, packages_text):
+    li = pkgblock.splitlines()
+    assert li[0].startswith("Package: "), li
+    pname = li[0].split(" ", 1)[1]
+    assert li[1].startswith("Version: "), li
+    pver = li[1].split(" ", 1)[1]
+
+    m = f"Package: {pname}\nVersion: {pver}"
+    if m in packages_text:
+        raise DuplicatePkgError()
+
+
 class Bintray:
     """Bintray backend"""
 
@@ -435,6 +451,9 @@ class S3:
         # assert r == 0
         debfn = "fastpath_0.3_all.deb"
 
+        # Check for already uploaded package
+        check_duplicate_package(pkgblock, packages.read_text())
+
         # Append, then read whole file back
         with packages.open("a") as f:
             f.write(pkgblock)
@@ -450,13 +469,13 @@ class S3:
         rfdata = self.generate_release_file(conf, packagesf_sha, packagesf_size)
         # print(rfdata)
         release.write_text(rfdata)
-        #r, o = runc(f"gpg -a -s --clearsign -o {inrelease} {release}")
-        #if r != 0:
+        # r, o = runc(f"gpg -a -s --clearsign -o {inrelease} {release}")
+        # if r != 0:
         #    self.unlock(baseuri)
         #    print("Error during GPG signature")
         #    sys.exit(1)
         sig = gpg.sign(release.read_text(), keyid=gpgkeyfp)
-        assert sig.status == 'signature created'
+        assert sig.status == "signature created"
         inrelease.write_bytes(sig.data)
 
         # Upload InRelease and Packages
@@ -490,6 +509,8 @@ class S3:
 
         try:
             self._inner_upload(tmpdir, baseuri, pkgblock, gpg, gpgkeyfp)
+        except DuplicatePkgError:
+            print("Error: {debfn} is already in the archive")
         finally:
             self.unlock(baseuri)
 
@@ -498,7 +519,6 @@ class S3:
     #  upload Packages.gz
     #  rm Packages.gz
 
-# TODO: prevent duplicate packages
 
 def main():
     global conf
