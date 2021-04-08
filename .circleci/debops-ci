@@ -510,7 +510,8 @@ class S3:
         try:
             self._inner_upload(tmpdir, baseuri, pkgblock, gpg, gpgkeyfp)
         except DuplicatePkgError:
-            print("Error: {debfn} is already in the archive")
+            print(f"Error: {debfn} is already in the archive. Not uploading.")
+            sys.exit(1)  # the unlock in the finally block is still executed
         finally:
             self.unlock(baseuri)
 
